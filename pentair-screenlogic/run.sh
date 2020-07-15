@@ -1,19 +1,19 @@
 #!/bin/bash
-set +u
+#set -e
 
 CONFIG_PATH=/data/options.json
 
-export MQTTIP="$(bashio::config 'MQTT_server')"
-export MQTTPORT="$(bashio::config 'MQTT_port')"
-export MQTTUSER="$(bashio::config 'MQTT_user')"
-export MQTTPASS="$(bashio::config 'MQTT_password')"
-export SCREENLOGICIP="$(bashio::config 'ScreenLogic_server')"
-export POOLCIRCUIT="$(bashio::config 'pool_circuit')"
-export SPACIRCUIT="$(bashio::config 'spa_circuit')"
-export POOLLIGHTCIRCUIT="$(bashio::config 'pool_light_circuit')"
-export SPALIGHTCIRCUIT="$(bashio::config 'spa_light_circuit')"
-export JETSCIRCUIT="$(bashio::config 'jets_circuit')"
-export CLEANERCIRCUIT="$(bashio::config 'cleaner_circuit')"
+export MQTTIP=$(jq --raw-output ".MQTT_server" $CONFIG_PATH) #"$(bashio::config 'MQTT_server')"
+export MQTTPORT=$(jq --raw-output ".MQTT_port" $CONFIG_PATH) #"$(bashio::config 'MQTT_port')"
+export MQTTUSER=$(jq --raw-output ".MQTT_user" $CONFIG_PATH) #"$(bashio::config 'MQTT_user')"
+export MQTTPASS=$(jq --raw-output ".MQTT_password" $CONFIG_PATH) #"$(bashio::config 'MQTT_password')"
+export SCREENLOGICIP=$(jq --raw-output ".ScreenLogic_server" $CONFIG_PATH) #"$(bashio::config 'ScreenLogic_server')"
+export POOLCIRCUIT=$(jq --raw-output ".pool_circuit" $CONFIG_PATH) #"$(bashio::config 'pool_circuit')"
+export SPACIRCUIT=$(jq --raw-output ".spa_circuit" $CONFIG_PATH) #"$(bashio::config 'spa_circuit')"
+export POOLLIGHTCIRCUIT=$(jq --raw-output ".pool_light_circuit" $CONFIG_PATH) #"$(bashio::config 'pool_light_circuit')"
+export SPALIGHTCIRCUIT=$(jq --raw-output ".spa_light_circuit" $CONFIG_PATH) #"$(bashio::config 'spa_light_circuit')"
+export JETSCIRCUIT=$(jq --raw-output ".jets_circuit" $CONFIG_PATH) #"$(bashio::config 'jets_circuit')"
+export CLEANERCIRCUIT=$(jq --raw-output ".cleaner_circuit" $CONFIG_PATH) #"$(bashio::config 'cleaner_circuit')"
 
 declare -A MESSAGELOOKUP
 MESSAGELOOKUP=( ["ON"]="1" ["OFF"]="0" ["spa"]="1" ["pool"]="0" ["heat"]="1")
