@@ -6,8 +6,6 @@ var screenLogicIp = process.env.SCREENLOGICIP;
 
 connect(new ScreenLogic.UnitConnection(80, screenLogicIp));
 
-console.log(process.env);
-
 // generic connection method used by all above examples
 function connect(client) {
   client.on('loggedIn', function() {
