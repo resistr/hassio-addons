@@ -1,9 +1,9 @@
 {
-  "name": "Pentair Screenlogic",
-  "version": "1.19",
+  "name": "Pentair Screenlogic - Beta",
+  "version": "1.19.x",
   "slug": "pentair_screenlogic",
-  "description": "Pentair Screenlogic",
-  "url": "https://github.com/bwoodworth/hassio-addons/tree/master/pentair-screenlogic",
+  "description": "Pentair Screenlogic - Beta",
+  "url": "https://github.com/resistr/hassio-addons/tree/master/pentair-screenlogic",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "startup": "before",
   "boot": "auto",
