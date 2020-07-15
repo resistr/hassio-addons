@@ -6,7 +6,8 @@ var myArgs = process.argv.slice(2);
 var screenLogic_password = process.env.ScreenLogic_password;
 
 connect(new ScreenLogic.UnitConnection(80, myArgs[0], screenLogic_password));
-console.log('JB: Screen Logic Server from env=' + screenLogic_password);
+
+console.log(screenLogic_password);
 
 // generic connection method used by all above examples
 function connect(client) {
