@@ -16,7 +16,6 @@ export JETSCIRCUIT=$(jq --raw-output ".jets_circuit" $CONFIG_PATH) #"$(bashio::c
 export CLEANERCIRCUIT=$(jq --raw-output ".cleaner_circuit" $CONFIG_PATH) #"$(bashio::config 'cleaner_circuit')"
 
 declare -A MESSAGELOOKUP
-declare -a TOPICPARTS
 
 MESSAGELOOKUP=( ["ON"]="1" ["OFF"]="0" ["spa"]="1" ["pool"]="0" ["heat"]="1")
 
