@@ -2,21 +2,25 @@
 #set -e
 
 CONFIG_PATH=/data/options.json
-MQTTIP=$(jq --raw-output ".MQTT_server" $CONFIG_PATH)
-MQTTPORT=$(jq --raw-output ".MQTT_port" $CONFIG_PATH)
-MQTTUSER=$(jq --raw-output ".MQTT_user" $CONFIG_PATH)
-MQTTPASS=$(jq --raw-output ".MQTT_password" $CONFIG_PATH)
-SCREENLOGICIP=$(jq --raw-output ".ScreenLogic_server" $CONFIG_PATH)
-POOLCIRCUIT=$(jq --raw-output ".pool_circuit" $CONFIG_PATH)
-SPACIRCUIT=$(jq --raw-output ".spa_circuit" $CONFIG_PATH)
-POOLLIGHTCIRCUIT=$(jq --raw-output ".pool_light_circuit" $CONFIG_PATH)
-SPALIGHTCIRCUIT=$(jq --raw-output ".spa_light_circuit" $CONFIG_PATH)
-JETSCIRCUIT=$(jq --raw-output ".jets_circuit" $CONFIG_PATH)
-CLEANERCIRCUIT=$(jq --raw-output ".cleaner_circuit" $CONFIG_PATH)
+
+export MQTTIP="$(bashio::config 'MQTT_server')"
+export MQTTPORT="$(bashio::config 'MQTT_port')"
+export MQTTUSER="$(bashio::config 'MQTT_user')"
+export MQTTPASS="$(bashio::config 'MQTT_password')"
+export SCREENLOGICIP="$(bashio::config 'ScreenLogic_server')"
+export POOLCIRCUIT="$(bashio::config 'pool_circuit')"
+export SPACIRCUIT="$(bashio::config 'spa_circuit')"
+export POOLLIGHTCIRCUIT="$(bashio::config 'pool_light_circuit')"
+export SPALIGHTCIRCUIT="$(bashio::config 'spa_light_circuit')"
+export JETSCIRCUIT="$(bashio::config 'jets_circuit')"
+export CLEANERCIRCUIT="$(bashio::config 'cleaner_circuit')"
+
+declare -A MESSAGELOOKUP
+MESSAGELOOKUP=( ["ON"]="1" ["OFF"]="0" ["spa"]="1" ["pool"]="0" ["heat"]="1")
 
 cd /node_modules/node-screenlogic
 
-node initialize.js $SCREENLOGICIP
+node initialize.js
 
 while [ 1 ]; do
 # change IP address (-h) port (-p) username (-u) and password (-P) to match your MQTT broker settings
@@ -25,182 +29,53 @@ if [ $? -gt 0 ]; then
   echo "MQTT Client exited with non-zero status"
   sleep 10
 else
+  echo "$PAYLOAD"
   TOPIC=`echo $PAYLOAD | awk '{print $1}'`
   MESSAGE=`echo $PAYLOAD | awk '{print $2}'`
+  IFS="/"
+  read -ra TOPICPARTS <<< $TOPIC
 
-  case $TOPIC in
-    "pentair/circuit/500/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 500 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 500 0
-    fi
+  TOPICROOT=$TOPICPARTS[0]
+
+  if [ TOPICROOT == "pentair" ]; then
+
+    TOPICACTION=$TOPICPARTS[1]
+
+    case $TOPICACTION in
+      "circuit")
+      CIRCUITNUMBER=$TOPICPARTS[2]
+      CIRCUITACTION=$TOPICPARTS[3]
+      CIRCUITCOMMAND=$MESSAGELOOKUP[$MESSAGE]
+      if [ CIRCUITACTION == "command" ]; then
+        echo "set_circuit $CIRCUITNUMBER $CIRCUITCOMMAND"
+        ./set_circuit $CIRCUITNUMBER $CIRCUITCOMMAND
+      fi
     ;;
-    "pentair/circuit/501/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 501 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 501 0
-    fi
+      "heater")
+      POOLSYSTEM=$MESSAGELOOKUP[$TOPICPARTS[2]]
+      HEATERACTION=$TOPICPARTS[3]
+      HEATERCOMMAND=$TOPICPARTS[4]
+      if [ HEATERACTION == "mode" && HEATERCOMMAND == "set" ]; then
+        HEATERMESSAGE=$MESSAGELOOKUP[$MESSAGE]
+        echo "set_heater $POOLSYSTEM $HEATERMESSAGE"
+        ./set_heater $POOLSYSTEM $HEATERMESSAGE
+      fi
+      if [ HEATERACTION == "temperature" && HEATERCOMMAND == "set" ]; then
+        echo "set_temp $POOLSYSTEM $MESSAGE"
+        ./set_temp $POOLSYSTEM "$MESSAGE"
+      fi
     ;;
-    "pentair/circuit/502/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 502 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 502 0
-    fi
-    ;;
-    "pentair/circuit/503/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 503 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 503 0
-    fi
-    ;;
-    "pentair/circuit/504/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 504 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 504 0
-    fi
-    ;;
-    "pentair/circuit/505/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 505 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 505 0
-    fi
-    ;;
-    "pentair/circuit/506/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 506 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 506 0
-    fi
-    ;;
-    "pentair/circuit/507/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 507 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 507 0
-    fi
-    ;;
-    "pentair/circuit/508/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 508 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 508 0
-    fi
-    ;;
-    "pentair/circuit/509/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 509 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 509 0
-    fi
-    ;;
-    "pentair/circuit/510/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 510 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 510 0
-    fi
-    ;;
-    "pentair/circuit/511/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 511 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 511 0
-    fi
-    ;;
-    "pentair/circuit/512/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 512 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 512 0
-    fi
-    ;;
-    "pentair/circuit/513/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 513 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 513 0
-    fi
-    ;;
-    "pentair/circuit/514/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 514 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 514 0
-    fi
-    ;;
-    "pentair/circuit/515/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 515 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 515 0
-    fi
-    ;;
-    "pentair/circuit/516/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 516 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 516 0
-    fi
-    ;;
-    "pentair/circuit/517/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 517 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 517 0
-    fi
-    ;;
-    "pentair/circuit/518/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 518 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 518 0
-    fi
-    ;;
-    "pentair/circuit/519/command")
-    if [ "${MESSAGE}" == "ON" ]; then
-      ./set_circuit $SCREENLOGICIP 519 1
-    elif [ "${MESSAGE}" == "OFF" ]; then
-      ./set_circuit $SCREENLOGICIP 519 0
-    fi
-    ;;
-    "pentair/heater/spa/mode/set")
-    if [ "${MESSAGE}" == "heat" ]; then
-      ./set_heater $SCREENLOGICIP 1 1
-    elif [ "${MESSAGE}" == "off" ]; then
-      ./set_heater $SCREENLOGICIP 1 0
-    fi
-    ;;
-    "pentair/heater/pool/mode/set")
-    if [ "${MESSAGE}" == "heat" ]; then
-      ./set_heater $SCREENLOGICIP 0 1
-    elif [ "${MESSAGE}" == "off" ]; then
-      ./set_heater $SCREENLOGICIP 0 0
-    fi
-    ;;
-    "pentair/heater/spa/temperature/set")
-    if [ 1 ]; then
-      ./set_temp $SCREENLOGICIP 1 "${MESSAGE}"
-    fi
-    ;;
-    "pentair/heater/pool/temperature/set")
-    if [ 1 ]; then
-      ./set_temp $SCREENLOGICIP 0 "${MESSAGE}"
-    fi
-    ;;
-    "pentair/light/command")
-    if [ 1 ]; then
-      ./set_light $SCREENLOGICIP "${MESSAGE}"
-    fi
+    "light")
+      LIGHTACTION=$TOPICPARTS[2]
+      if [ LIGHTACTION == "command" ]; then
+        echo "set_light $MESSAGE"
+        ./set_light "${MESSAGE}"
+      fi
     esac
+
 fi
 
 # change IP address (-h) port (-p) username (-u) and password (-P) to match your MQTT broker settings
-node send_state_to_ha.js $SCREENLOGICIP | awk -F, '{print "mosquitto_pub -h '"$MQTTIP"' -p '"$MQTTPORT"' -u '"$MQTTUSER"' -P '"$MQTTPASS"' -t " $1 " -m " $2}' | bash -s
+node send_state_to_ha.js | awk -F, '{print "mosquitto_pub -h '"$MQTTIP"' -p '"$MQTTPORT"' -u '"$MQTTUSER"' -P '"$MQTTPASS"' -t " $1 " -m " $2}' | bash -s
 
 done
