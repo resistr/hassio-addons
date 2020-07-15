@@ -36,10 +36,11 @@ else
   read -ra TOPICPARTS <<< $TOPIC
 
   TOPICROOT=$TOPICPARTS[0]
-
+  echo "$TOPICROOT"
   if [ TOPICROOT == "pentair" ]; then
 
     TOPICACTION=$TOPICPARTS[1]
+    echo "$TOPICACTION"
 
     case $TOPICACTION in
       "circuit")
