@@ -72,7 +72,7 @@ else
         ./set_light "${MESSAGE}"
       fi
     esac
-
+  fi
 fi
 
 # change IP address (-h) port (-p) username (-u) and password (-P) to match your MQTT broker settings
