@@ -39,7 +39,7 @@ else
 
   TOPICROOT="${TOPICPARTS[0]}"
   echo "$TOPICROOT"
-  if [ $TOPICROOT == "pentair" ]; then
+  if [ $TOPICROOT -eq "pentair" ]; then
 
     TOPICACTION="${TOPICPARTS[1]}"
     echo "$TOPICACTION"
@@ -49,7 +49,7 @@ else
       CIRCUITNUMBER="${TOPICPARTS[2]}"
       CIRCUITACTION="${TOPICPARTS[3]}"
       CIRCUITCOMMAND="${MESSAGELOOKUP[$MESSAGE]}"
-      if [ $CIRCUITACTION == "command" ]; then
+      if [ $CIRCUITACTION -eq "command" ]; then
         echo "set_circuit $CIRCUITNUMBER $CIRCUITCOMMAND"
         ./set_circuit $CIRCUITNUMBER $CIRCUITCOMMAND
       fi
@@ -58,19 +58,19 @@ else
       POOLSYSTEM="${MESSAGELOOKUP[${TOPICPARTS[2]}]}"
       HEATERACTION="${TOPICPARTS[3]}"
       HEATERCOMMAND="${TOPICPARTS[4]}"
-      if [ $HEATERACTION == "mode" && $HEATERCOMMAND == "set" ]; then
+      if [ $HEATERACTION -eq "mode" && $HEATERCOMMAND -eq "set" ]; then
         HEATERMESSAGE="${MESSAGELOOKUP[$MESSAGE]}"
         echo "set_heater $POOLSYSTEM $HEATERMESSAGE"
         ./set_heater $POOLSYSTEM $HEATERMESSAGE
       fi
-      if [ $HEATERACTION == "temperature" && $HEATERCOMMAND == "set" ]; then
+      if [ $HEATERACTION -eq "temperature" && $HEATERCOMMAND -eq "set" ]; then
         echo "set_temp $POOLSYSTEM $MESSAGE"
         ./set_temp $POOLSYSTEM "$MESSAGE"
       fi
     ;;
     "light")
       LIGHTACTION="${TOPICPARTS[2]}"
-      if [ $LIGHTACTION == "command" ]; then
+      if [ $LIGHTACTION -eq "command" ]; then
         echo "set_light $MESSAGE"
         ./set_light "$MESSAGE"
       fi
