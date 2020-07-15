@@ -35,17 +35,17 @@ else
   IFS="/"
   read -ra TOPICPARTS <<< $TOPIC
 
-  TOPICROOT=$TOPICPARTS[0]
+  TOPICROOT="$TOPICPARTS[0]"
   echo "$TOPICROOT"
   if [ TOPICROOT == "pentair" ]; then
 
-    TOPICACTION=$TOPICPARTS[1]
+    TOPICACTION="$TOPICPARTS[1]"
     echo "$TOPICACTION"
 
     case $TOPICACTION in
       "circuit")
-      CIRCUITNUMBER=$TOPICPARTS[2]
-      CIRCUITACTION=$TOPICPARTS[3]
+      CIRCUITNUMBER="$TOPICPARTS[2]"
+      CIRCUITACTION="$TOPICPARTS[3]"
       CIRCUITCOMMAND=$MESSAGELOOKUP[$MESSAGE]
       if [ CIRCUITACTION == "command" ]; then
         echo "set_circuit $CIRCUITNUMBER $CIRCUITCOMMAND"
@@ -53,11 +53,11 @@ else
       fi
     ;;
       "heater")
-      POOLSYSTEM=$MESSAGELOOKUP[$TOPICPARTS[2]]
-      HEATERACTION=$TOPICPARTS[3]
-      HEATERCOMMAND=$TOPICPARTS[4]
+      POOLSYSTEM="$MESSAGELOOKUP[$TOPICPARTS[2]]"
+      HEATERACTION="$TOPICPARTS[3]"
+      HEATERCOMMAND="$TOPICPARTS[4]"
       if [ HEATERACTION == "mode" && HEATERCOMMAND == "set" ]; then
-        HEATERMESSAGE=$MESSAGELOOKUP[$MESSAGE]
+        HEATERMESSAGE="$MESSAGELOOKUP[$MESSAGE]"
         echo "set_heater $POOLSYSTEM $HEATERMESSAGE"
         ./set_heater $POOLSYSTEM $HEATERMESSAGE
       fi
@@ -67,10 +67,10 @@ else
       fi
     ;;
     "light")
-      LIGHTACTION=$TOPICPARTS[2]
+      LIGHTACTION="$TOPICPARTS[2]"
       if [ LIGHTACTION == "command" ]; then
         echo "set_light $MESSAGE"
-        ./set_light "${MESSAGE}"
+        ./set_light "$MESSAGE"
       fi
     esac
   fi
